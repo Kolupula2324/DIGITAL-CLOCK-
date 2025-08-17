@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>World Clock</title>
+  <style>
+    body {
+      font-family: 'Courier New', Courier, monospace;
+      background-color: #222;
+      color: #0f0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      flex-direction: column;
+    }
+    .clock-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+    }
+    .clock {
+      font-size: 16px;
+      letter-spacing: 1px;
+      width: 250px;
+      height: 250px;
+      border: 5px solid #0f0;
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      box-shadow: 0 0 10px #0f0;
+      padding: 10px;
+      cursor: pointer;
+    }
+    .clock h3 {
+      margin: 0;
+      font-size: 18px;
+    }
+    .clock p {
+      margin: 5px 0;
+      font-size: 16px;
+    }
+    .clock .date {
+      font-size: 14px;
+      margin-top: 5px;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.8);
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background-color: #333;
+      color: #0f0;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      position: relative;
+    }
+    .modal-content img {
+      width: 200px;
+      height: auto;
+      margin: 10px 0;
+      border-radius: 10px;
+    }
+    .modal-content h3 {
+      margin: 0 0 10px;
+    }
+    .close {
+      color: #f00;
+      font-size: 20px;
+      font-weight: bold;
+      position: absolute;
+      top: 10px;
+      right: 20px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="clock-container" id="clockContainer"></div>
+
+  <div class="modal" id="modal">
+    <div class="modal-content">
+      <span class="close" id="closeModal">&times;</span>
+      <h3 id="modalTitle"></h3>
+      <img id="modalImage" src="" alt="Watch Image">
+      <p id="modalTime"></p>
+      <p id="modalDate"></p>
+    </div>
+  </div>
+
+  <script>
+    const timeZones = [
+      { name: "New York", timeZone: "America/New_York", image: "newyork.jpg" },
+      { name: "London", timeZone: "Europe/London", image: "london.jpg" },
+      { name: "Tokyo", timeZone: "Asia/Tokyo", image: "tokyo.jpg" },
+      { name: "Sydney", timeZone: "Australia/Sydney", image: "sydney.jpg" },
+      { name: "Dubai", timeZone: "Asia/Dubai", image: "dubai.jpg" },
+      { name: "Mumbai", timeZone: "Asia/Kolkata", image: "mumbai.jpg" }
+    ];
+
+    function updateClocks() {
+      const clockContainer = document.getElementById('clockContainer');
+      clockContainer.innerHTML = ''; // Clear previous content
+
+      timeZones.forEach(({ name, timeZone, image }) => {
+        const now = new Date().toLocaleString("en-US", { timeZone });
+        const date = new Date(now);
+        let hours = date.getHours();
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        const seconds = String(date.getSeconds()).padStart(2, '0');
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12 || 12; // Convert to 12-hour format
+        const day = date.toLocaleDateString("en-US", { weekday: 'long' });
+        const fullDate = date.toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' });
+
+        const clockDiv = document.createElement('div');
+        clockDiv.className = 'clock';
+        clockDiv.innerHTML = `
+          <h3>${name}</h3>
+          <p>${String(hours).padStart(2, '0')}:${minutes}:${seconds} ${ampm}</p>
+          <p class="date">${day}, ${fullDate}</p>
+        `;
+        clockDiv.addEventListener('click', () => showModal(name, `${String(hours).padStart(2, '0')}:${minutes}:${seconds} ${ampm}`, `${day}, ${fullDate}`, image));
+        clockContainer.appendChild(clockDiv);
+      });
+    }
+
+    function showModal(title, time, date, image) {
+      const modal = document.getElementById('modal');
+      document.getElementById('modalTitle').textContent = title;
+      document.getElementById('modalTime').textContent = time;
+      document.getElementById('modalDate').textContent = date;
+      document.getElementById('modalImage').src = image;
+      modal.style.display = 'flex';
+    }
+
+    document.getElementById('closeModal').addEventListener('click', () => {
+      document.getElementById('modal').style.display = 'none';
+    });
+
+    setInterval(updateClocks, 1000);
+    updateClocks(); // Initial call
+  </script>
+</body>
+</html>
